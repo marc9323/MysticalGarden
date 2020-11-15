@@ -6,12 +6,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.youtube.tutorial.TutorialYouTube;
 
-public class GameScreen implements Screen {
-
-    private final TutorialYouTube context;
+public class GameScreen extends AbstractScreen {
 
     public GameScreen(final TutorialYouTube context) {
-        this.context = context;
+        super(context);
     }
 
     @Override
