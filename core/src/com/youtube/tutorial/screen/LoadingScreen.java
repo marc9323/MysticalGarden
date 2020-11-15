@@ -25,7 +25,7 @@ public class LoadingScreen extends AbstractScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-            System.out.println("KEY PRESSD");
+            System.out.println("KEY A PRESSED");
 //            ((Game)Gdx.app.getApplicationListener()).setScreen(new GameScreen());
             context.setScreen(ScreenType.GAME);
         }
