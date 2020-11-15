@@ -1,33 +1,50 @@
 package com.youtube.tutorial;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.sun.prism.image.ViewPort;
+import com.youtube.tutorial.screen.LoadingScreen;
+import com.youtube.tutorial.screen.ScreenType;
 
-public class TutorialYouTube extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
-	
+import java.util.EnumMap;
+
+public class TutorialYouTube extends Game {
+
+	private static final String TAG = TutorialYouTube.class.getSimpleName();
+
+	private EnumMap<ScreenType, Screen> screenCache;
+
 	@Override
 	public void create () {
-		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+
+		screenCache = new EnumMap<ScreenType, Screen>(ScreenType.class);
+		setScreen(ScreenType.LOADING);
 	}
 
-	@Override
-	public void render () {
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+	// use the cache so we don't create a new screen every time we switch
+	public void setScreen(final ScreenType screenType) {
+		final Screen screen = screenCache.get(screenType);
+		if(screen == null) {
+			// screen not created yet - create it
+			try {
+				Gdx.app.debug(TAG, "Creating new screen: " + screenType);
+				final Screen newScreen = (Screen) ClassReflection.getConstructor(screenType.getScreenClass(), TutorialYouTube.class).newInstance(this);
+				screenCache.put(screenType, (Screen)newScreen);
+				setScreen(newScreen);
+			} catch (ReflectionException e) {
+				throw new GdxRuntimeException("Screen " + screenType + " could not be created", e);
+			}
+		} else {
+			Gdx.app.debug(TAG,"Switching to screen: " + screenType);
+			setScreen(screen);
+		}
 	}
-	
-	@Override
-	public void dispose () {
-		batch.dispose();
-		img.dispose();
-	}
+
 }
