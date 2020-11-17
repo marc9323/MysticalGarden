@@ -31,6 +31,7 @@ public class GameScreen extends AbstractScreen {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         player = world.createBody(bodyDef);
         player.setUserData("PLAYER");
+        fixtureDef.density = 1;
         fixtureDef.isSensor = false;
         fixtureDef.restitution = 0;
         fixtureDef.friction = 0.2f;
@@ -60,81 +61,6 @@ public class GameScreen extends AbstractScreen {
         body.createFixture(fixtureDef);
         chainShape.dispose();
 
-//        bodyDef.position.set(4.5f, 15);
-//        bodyDef.gravityScale = 1;
-//        bodyDef.type = BodyDef.BodyType.DynamicBody;
-//        Body body = world.createBody(bodyDef);
-//        body.setUserData("CIRCLE");
-//
-//        // can move through static bodies but will still notify on collision
-//        fixtureDef.isSensor = false;
-//        fixtureDef.restitution = 0.5f;  // elasticity of the body, bounciness
-//        fixtureDef.friction = 0.2f;
-//        fixtureDef.filter.categoryBits = BIT_CIRCLE;
-//        fixtureDef.filter.maskBits = BIT_GROUND;
-//        CircleShape cShape = new CircleShape();
-//        cShape.setRadius(0.5f);
-//        fixtureDef.shape = cShape;
-//        body.createFixture(fixtureDef);
-//        cShape.dispose();
-//        // category bit defines category of fixture player, gameobj, platform, etc
-//        // mask bit defines what kind of other categories it can collide with platform but not box etc.
-//
-//        fixtureDef.isSensor = true;
-//        fixtureDef.restitution = 0;
-//        fixtureDef.friction = 0.2f;
-//        fixtureDef.filter.categoryBits = BIT_CIRCLE;
-//        fixtureDef.filter.maskBits = BIT_BOX;
-//        ChainShape chainShape = new ChainShape();
-//        chainShape.createChain(new float[]{-0.5f, -0.7f, 0.5f, -0.7f});
-//        fixtureDef.shape = chainShape;
-//        body.createFixture(fixtureDef);
-//        chainShape.dispose();
-//
-//        // create a  BOX
-//        bodyDef.position.set(5.3f, 6);
-//        bodyDef.gravityScale = 1;
-//        bodyDef.type = BodyDef.BodyType.DynamicBody;
-//        body = world.createBody(bodyDef);
-//        body.setUserData("BOX");
-//
-//        // can move through static bodies but will still notify on collision
-//        fixtureDef.isSensor = false;
-//        fixtureDef.restitution = 0.5f;  // elasticity of the body, bounciness
-//        fixtureDef.friction = 0.2f;
-//        fixtureDef.filter.categoryBits = BIT_BOX;
-//        fixtureDef.filter.maskBits = BIT_GROUND | BIT_CIRCLE;
-//
-//        PolygonShape pShape = new PolygonShape();
-//        pShape.setAsBox(.5f, .5f);
-//        //pShape.setRadius(0.5f);
-//        fixtureDef.shape = pShape;
-//        body.createFixture(fixtureDef);
-//        pShape.dispose();
-//
-//        //  PLATFORM
-//        bodyDef.position.set(4.5f, 2);
-//        bodyDef.gravityScale = 1;
-//        bodyDef.type = BodyDef.BodyType.StaticBody;
-//        body = world.createBody(bodyDef);
-//        body.setUserData("PLATFORM");
-//
-//        // can move through static bodies but will still notify on collision
-//        fixtureDef.isSensor = false;
-//        fixtureDef.restitution = 0.5f;  // elasticity of the body, bounciness
-//        fixtureDef.friction = 0.2f;
-//        fixtureDef.filter.categoryBits = BIT_GROUND;
-//        fixtureDef.filter.maskBits = -1; // collides with everything
-//
-//        pShape = new PolygonShape();
-//        pShape.setAsBox(4f, .5f);
-//        fixtureDef.shape = pShape;
-//        //pShape.setRadius(0.5f);
-//        body.createFixture(fixtureDef);
-//        pShape.dispose();
-
-
-
     }
 
     @Override
@@ -147,10 +73,36 @@ public class GameScreen extends AbstractScreen {
         Gdx.gl.glClearColor(0, 0, 0, 1); // background color
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if(Gdx.input.isKeyPressed(Input.Keys.D)) {
+        if(Gdx.input.isKeyPressed(Input.Keys.X)) {
 //            ((Game)Gdx.app.getApplicationListener()).setScreen(new GameScreen());
             context.setScreen(ScreenType.LOADING);
         }
+
+        final float speedX;
+        final float speedY;
+
+        if(Gdx.input.isKeyPressed(Input.Keys.A)) {
+            speedX = -3;
+        } else if(Gdx.input.isKeyPressed(Input.Keys.D)) {
+            speedX = 3;
+        } else  {
+            speedX = 0;
+        }
+
+        if(Gdx.input.isKeyPressed(Input.Keys.W)) {
+            speedY = 3;
+        } else if(Gdx.input.isKeyPressed(Input.Keys.S)) {
+            speedY = -3;
+        } else  {
+            speedY = 0;
+        }
+
+        player.applyLinearImpulse(
+                (speedX - player.getLinearVelocity().x) * player.getMass(),
+                (speedY - player.getLinearVelocity().y) * player.getMass(),
+                player.getWorldCenter().x , player.getWorldCenter().y , true
+
+        );
 
         viewport.apply(true);
        // world.step(delta, 6, 2);
