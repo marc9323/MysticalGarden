@@ -3,6 +3,10 @@ package com.youtube.tutorial.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.youtube.tutorial.TutorialYouTube;
@@ -16,8 +20,18 @@ public class GameScreen extends AbstractScreen {
 
     private Body player;
 
+    private final AssetManager assetManager;
+
+    private final OrthogonalTiledMapRenderer mapRenderer;
+    private final OrthographicCamera gameCamera;
+
     public GameScreen(final TutorialYouTube context) {
         super(context);
+
+        assetManager = context.getAssetManager();  // ??????????????
+        // 1 physics unit is 32 pixels or one tile of our tilemap
+        this.mapRenderer = new OrthogonalTiledMapRenderer(null, UNIT_SCALE, context.getSpriteBatch());
+        this.gameCamera = context.getGameCamera();
 
         // body is a container for many different fixtures
 
@@ -65,7 +79,8 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     public void show() {
-
+        System.out.println("Map Renderer: " + mapRenderer);
+        mapRenderer.setMap(assetManager.get("map/map.tmx", TiledMap.class));
     }
 
     @Override
@@ -105,6 +120,9 @@ public class GameScreen extends AbstractScreen {
         );
 
         viewport.apply(true);
+
+        mapRenderer.setView(gameCamera);
+        mapRenderer.render();
        // world.step(delta, 6, 2);
 
         box2DDebugRenderer.render(world, viewport.getCamera().combined);

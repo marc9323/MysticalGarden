@@ -3,6 +3,7 @@ package com.youtube.tutorial;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
@@ -22,9 +23,12 @@ public class TutorialYouTube extends Game {
 
 	private static final String TAG = TutorialYouTube.class.getSimpleName();
 
+	private SpriteBatch spriteBatch;
 	private EnumMap<ScreenType, AbstractScreen> screenCache;
 	private OrthographicCamera gameCamera;
 	private FitViewport screenViewport;
+
+	public static final float UNIT_SCALE = 1 / 32f;
 
 	public static final short BIT_CIRCLE = 1 << 0;
 	public static final short BIT_BOX = 1 << 1;
@@ -43,6 +47,7 @@ public class TutorialYouTube extends Game {
 	@Override
 	public void create () {
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+		spriteBatch = new SpriteBatch();
 		accumulator = 0;
 
 		Box2D.init();
@@ -53,15 +58,21 @@ public class TutorialYouTube extends Game {
 
 		box2DDebugRenderer = new Box2DDebugRenderer();
 
+		// intialize assetmMnager
+		assetManager = new AssetManager();
+		assetManager.setLoader(TiledMap.class, new TmxMapLoader(assetManager.getFileHandleResolver()));
+
 		// 16 x 9 aspect ratio -s et first screen
 		gameCamera = new OrthographicCamera();
 		screenViewport = new FitViewport(9, 16, gameCamera);
 		screenCache = new EnumMap<ScreenType, AbstractScreen>(ScreenType.class);
-		setScreen(ScreenType.GAME);
+		setScreen(ScreenType.LOADING);
 
-		// intialize assetmMnager
-		assetManager = new AssetManager();
-		assetManager.setLoader(TiledMap.class, new TmxMapLoader(assetManager.getFileHandleResolver()));
+
+	}
+
+	public SpriteBatch getSpriteBatch() {
+		return this.spriteBatch;
 	}
 
 	public AssetManager getAssetManager() {
